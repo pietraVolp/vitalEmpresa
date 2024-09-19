@@ -4,7 +4,7 @@ const button = document.getElementById('entrar')
 const senhaInput = document.getElementById('senha')
 
 
-const validarLogin = async () => {
+const validarLogin = async (id) => {
   const cnpj = document.getElementById('cnpj').value.trim()
   const password = document.getElementById('senha').value.trim()
 
@@ -18,13 +18,13 @@ const validarLogin = async () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ cnpj, senha: password }),
-      })
+    })
 
       const result = await response.json()
 
       if (response.ok) {
         if (result.status_code === 200) {
-          localStorage.setItem('idC', result.idEmpresa)
+          localStorage.setItem('idC', result.id_empresa)
           window.location.href = '/Front/html/home.html'
         } else {
           alert(result.message || 'Ocorreu um erro inesperado.')
