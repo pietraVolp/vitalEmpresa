@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cadastro = document.getElementById('cadastro')
   const toggleSenha = document.getElementById('toggleSenha')
 
-
-
   // Verifica se o botão foi encontrado
   if (cadastro) {
     cadastro.addEventListener('click', async () => {
@@ -35,25 +33,26 @@ document.addEventListener('DOMContentLoaded', () => {
         bairro: bairro.value,
         cidade: cidade.value,
         estado: estado.value,
-      
       }
 
       try {
-        const response = await fetch('http://localhost:8080/v1/vital/empresa', {
+        const response = await fetch('http://vital-umqy.onrender.com/v1/vital/empresa', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(userData),
+          redirect: 'manual'  // Evita seguir redirecionamentos automaticamente
         })
 
-        const result = await response.json()
-
+        // Verifica o código de status da resposta
         if (response.ok) {
+          const result = await response.json()
           alert('Usuário cadastrado com sucesso!')
           console.log(result)
           window.location.href = '/Front/html/login.html'
         } else {
+          const result = await response.json()
           alert(`Erro: ${result.message}`)
         }
       } catch (error) {
