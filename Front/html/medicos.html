@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="/Front/js/cadastromedicos.js" defer></script>
     <title>MÉDICOS</title>
 
 
@@ -93,7 +94,7 @@
             <h1 class="text-base text-blue-950 font-semibold ml-96 mt-3">ESPECIALIDADE</h1>
 
             <button onclick="openInfo()">
-                <H1 class="text-2xl text-blue-950 font-bold ml-[180px] mt-2">+</H1>
+                <H1 class="text-2xl text-blue-950 font-bold ml-[180px] mt-1">+</H1>
             </button>
 
         </div>
@@ -101,27 +102,42 @@
 </div>
 
 <div id="info" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-2/6 h-2/6">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-2/6 h-1/5 flex">
 
-       <div class="w-20 h-20 bg-gray-900 rounded-full"></div>
+       <div class="w-40 h-40 bg-gray-900 rounded-full"></div>
+
+       <div class="ml-10">
+       
+        <h1 class="text-blue-950 font-sans font-bold text-2xl">Dra. Maria da Silva</h1>
+          <p class="text-blue-950 font-sans font-semibold text-base mb-1">Dermatologista</p>
+
+        <div class="mt-5">
+          <P>maria@gmail.com</P>
+        </div>
+
+        <p class="mt-1">CRM: 87685-87</p>
+        <div class="mt-1">
+          (11)98675-8576
+        </div>
+       </div>
     
     </div>
 
 
 
 
-    <div class="ml-[-100px] mt-10">
-        <button onclick="closeInfo()"  class="">
+    <div class="ml-[-60px] mt-[-150px]">
+        <button onclick="closeInfo()"  class="text-blue-950 text-lg font-bold">
          X
         </button>
     </div>
 
-    </div>
+</div>
     
 
   
 
-</div>
+
 
 
 
@@ -195,10 +211,10 @@
               Imagem do médico
             </label>
             <input 
-              type="url" 
-              id="image-url" 
-              placeholder="https://exemplo.com/imagem.jpg" 
-              class="shadow-2xl w-96 h-12 text-base border border-gray-300 rounded-lg p-3  focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="date" 
+              id="dataNascimento" 
+              placeholder="00/00/0000" 
+              class="shadow-2xl w-96 h-12 text-blue-950 text-base border border-gray-300 rounded-lg p-3  focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
           </div>
           </div>
@@ -209,12 +225,12 @@
 
               <div class="ml-10 mt-1">
                 <label for="name" class="block text-stone-500 text-base font-sans mb-2 text-lg">CRM* </label>
-                <input type="name" id="email" placeholder="1234-56" class="shadow-2xl w-96 h-12 text-base border border-gray-300 rounded-lg p-3  focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="name" id="crm" placeholder="1234-56" class="shadow-2xl w-96 h-12 text-base border border-gray-300 rounded-lg p-3  focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <img src="/Front/img/heroicons_identification.png" alt="" class="ml-80 mt-[-35px] w-8">
               </div>
     
              <div class="ml-44 mt-10">
-                 <button onclick="closeModal()" id="cadastro" class="bg-blue-300 text-blue-950 font-bold px-4 py-2 rounded-lg hover:bg-blue-900">
+                 <button  id="cadastro" class="bg-blue-300 text-blue-950 font-bold px-4 py-2 rounded-lg hover:bg-blue-900">
                    CADASTRAR
                  </button>
              </div>
