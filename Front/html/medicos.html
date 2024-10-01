@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="/Front/js/cadastromedicos.js" defer></script>
+    <script type="module" src="/Front/js/infoMedicos.js" defer></script>
     <title>MÉDICOS</title>
 
 
@@ -85,7 +86,7 @@
     </div>
 
 
-    <div class="flex items-center justify-center ">
+    <div class="flex items-center justify-center " id="contanierMedico">
 
         <div class="bg-gray-300 w-1/2 h-12 absolute rounded-lg flex mt-32 ">
            
@@ -182,7 +183,7 @@
               </div>
 
               <div class="ml-12 mt-1">
-                <label for="options" class="block text-stone-500 text-base font-sans mb-2 text-lg">
+                <label for="options" id="especialidades" class="block text-stone-500 text-base font-sans mb-2 text-lg">
                   Escolha uma opção:
                 </label>
                 <select id="options" class="shadow-2xl w-96 h-12 text-base border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -230,7 +231,7 @@
               </div>
     
              <div class="ml-44 mt-10">
-                 <button  id="cadastro" class="bg-blue-300 text-blue-950 font-bold px-4 py-2 rounded-lg hover:bg-blue-900">
+                 <button onclick="closeInfo()" id="cadastro" class="bg-blue-300 text-blue-950 font-bold px-4 py-2 rounded-lg hover:bg-blue-900">
                    CADASTRAR
                  </button>
              </div>

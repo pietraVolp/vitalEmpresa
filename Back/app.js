@@ -18,7 +18,10 @@ const cors = require('cors')
 
 const app = express()
 
-app.use((request, response, next) =>{
+// Ativa as confgurações de cors
+app.use(cors())
+
+app.use((request, response, next) => {
 
     // Permite especificar quem podera acessar a API ('*' = Liberar acesso público, 'IP' = Liberar acesso apenas para aquela maquina);
     response.header('Access-Control-Allow-Origin', '*')
@@ -26,19 +29,21 @@ app.use((request, response, next) =>{
     // Permite especificar como a API, sera requisitada ('GET', 'POST', 'PUT' e 'DELETE')
     response.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
 
-    // Ativa as confgurações de cors
-    app.use(cors())
-
-
+    
+    
     next()
 })
-
 const bodyParserJSON = bodyParser.json()
 
 /*********************** Import dos arquivos de controller do projeto ***********************************/
     const controllerUsuario = require('./controller/controller_usuario.js')
     const controllerEmpresa = require('./controller/controller_empresa.js')
     const controllerMedico = require('./controller/controller_medico.js')
+    const controllerEspecialidade = require('./controller/controller_especialidade.js')
+    const controllerVideo = require('./controller/controller_video.js')
+    const controllerAvaliacao = require('./controller/controller_avaliacao.js')
+
+
 
 /*********************** USUARIO ***********************************/
     app.post('/v1/vital/usuario', cors(), bodyParserJSON, async function (request, response,next ){
@@ -66,7 +71,7 @@ const bodyParserJSON = bodyParser.json()
             const dadosBody = request.body;
     
             // Encaminha os dados para a controller
-            const resultDadosNovoUsuario = await controllerUsuario.setLoginUsuario(dadosBody, contentType);
+            const resultDadosNovoUsuario = await controllerUsuario.setLoginUsuario(dadosBody.email, dadosBody.senha);
     
             // Envia a resposta para o cliente
             response.status(resultDadosNovoUsuario.status_code);
@@ -101,6 +106,14 @@ const bodyParserJSON = bodyParser.json()
             response.status(404);
         }
     });
+
+    app.get('/v1/vital/filtroSexo/filtro', cors(), async function(request, response, next){
+        let descricao = request.query.descricao
+        let dadosSexo = await controllerUsuario.setFilterBySexo(descricao)
+
+        response.status(dadosSexo.status_code)
+        response.json(dadosSexo)
+    })
 
     app.get('/v1/vital/usuario/:id', cors(), async function(request,response,next){
 
@@ -144,6 +157,25 @@ const bodyParserJSON = bodyParser.json()
         response.json(resultDadosNovaEmpresa);
    
     })
+
+    app.post('/v1/vital/loginEmpresa', cors(), bodyParserJSON, async function (request, response, next) {
+        try {
+            // Recebe o Content-Type da requisição
+            const contentType = request.headers['content-type'];
+    
+            // Recebe os dados do corpo da requisição
+            const dadosBody = request.body;
+    
+            // Encaminha os dados para a controller
+            const resultDadosNovoUsuario = await controllerEmpresa.setLoginEmpresa(dadosBody.cnpj, dadosBody.senha);
+    
+            // Envia a resposta para o cliente
+            response.status(resultDadosNovoUsuario.status_code);
+            response.json(resultDadosNovoUsuario);
+        } catch (error) {
+            next(error);  // Passa o erro para o middleware de tratamento de erros
+        }
+    });
 
     app.get('/v1/vital/empresa', cors(),async function (request,response,next){
 
@@ -214,6 +246,25 @@ const bodyParserJSON = bodyParser.json()
    
     })
 
+    app.post('/v1/vital/loginMedico', cors(), bodyParserJSON, async function (request, response, next) {
+        try {
+            // Recebe o Content-Type da requisição
+            const contentType = request.headers['content-type'];
+    
+            // Recebe os dados do corpo da requisição
+            const dadosBody = request.body;
+    
+            // Encaminha os dados para a controller
+            const resultDadosNovoUsuario = await controllerMedico.setLoginMedico(dadosBody.crm, dadosBody.senha);
+    
+            // Envia a resposta para o cliente
+            response.status(resultDadosNovoUsuario.status_code);
+            response.json(resultDadosNovoUsuario);
+        } catch (error) {
+            next(error);  // Passa o erro para o middleware de tratamento de erros
+        }
+    });
+
     app.get('/v1/vital/medico', cors(),async function (request,response,next){
 
 
@@ -229,6 +280,22 @@ const bodyParserJSON = bodyParser.json()
             response.status(404);
         }
     });
+
+    app.get('/v1/vital/filtroMedico/filtro', cors(), async function(request, response, next){
+        let crm = request.query.crm
+        let dadosMedico = await controllerMedico.setFiltrar(crm)
+
+        response.status(dadosMedico.status_code)
+        response.json(dadosMedico)
+    })
+
+    app.get('/v1/vital/filtroMedicoEspecialidade/filtro', cors(), async function(request, response, next){
+        let especialidade = request.query.especialidade
+        let dadosMedico = await controllerMedico.setFiltrarPorEspecialidade(especialidade)
+
+        response.status(dadosMedico.status_code)
+        response.json(dadosMedico)
+    })
 
     app.get('/v1/vital/medico/:id', cors(), async function(request,response,next){
 
@@ -266,6 +333,163 @@ const bodyParserJSON = bodyParser.json()
     })
 
     /*********************** ESPECIALIDADES ***********************************/
+    app.post('/v1/vital/especialidade', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+        // recebe o ContentType com os tipos de dados encaminhados na requisição
+        let contentType = request.headers['content-type'];
+   
+        // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+        let dadosBody = request.body;
+        // encaminha os dados para a controller enviar para o DAO
+        let resultDadosNovaEspecialidade = await controllerEspecialidade.setInserir(dadosBody, contentType)
+   
+   
+        response.status(resultDadosNovaEspecialidade.status_code);
+        response.json(resultDadosNovaEspecialidade);
+   
+    })
+
+    app.get('/v1/vital/especialidade', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosEspecialidade = await controllerEspecialidade.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosEspecialidade){
+            response.json(dadosEspecialidade);
+            response.status(dadosEspecialidade.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/especialidade/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idEspecialidade = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosEspecialidade = await controllerEspecialidade.setListarPorId(idEspecialidade)
+    
+        response.status(dadosEspecialidade.status_code);
+        response.json(dadosEspecialidade);
+    })
+
+    app.get('/v1/vital/filtroEspecialidade/filtro', cors(), async function(request, response, next){
+        let nome = request.query.nome
+        let dadosEspecialidade = await controllerEspecialidade.setFiltrar(nome)
+
+        response.status(dadosEspecialidade.status_code)
+        response.json(dadosEspecialidade)
+    })
+
+    app.delete('/v1/vital/especialidade/:id', cors (), async function (request,response,next){
+
+        let idEspecialidade = request.params.id
+    
+        let dadosEspecialidade = await controllerEspecialidade.setDeletar(idEspecialidade);
+    
+        response.status(dadosEspecialidade.status_code);
+        response.json(dadosEspecialidade)
+    })
+
+     /*********************** VIDEOS ***********************************/
+     app.post('/v1/vital/video', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+        // recebe o ContentType com os tipos de dados encaminhados na requisição
+        let contentType = request.headers['content-type'];
+   
+        // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+        let dadosBody = request.body;
+        // encaminha os dados para a controller enviar para o DAO
+        let resultDadosNovoVideo = await controllerVideo.setInserir(dadosBody, contentType)
+   
+   
+        response.status(resultDadosNovoVideo.status_code);
+        response.json(resultDadosNovoVideo);
+   
+    })
+
+    app.get('/v1/vital/video', cors(),async function (request,response,next){
+
+
+        // chama a função da controller para retornar os filmes;
+        let dadosVideo = await controllerVideo.setListar()
+   
+        // validação para retornar o Json dos filmes ou retornar o erro 404;
+        if(dadosVideo){
+            response.json(dadosVideo);
+            response.status(dadosVideo.status_code);
+        }else{
+            response.json({message: 'Nenhum registro foi encontrado'});
+            response.status(404);
+        }
+    });
+
+    app.get('/v1/vital/video/:id', cors(), async function(request,response,next){
+
+        // recebe o id da requisição
+        let idVideo = request.params.id
+    
+        //encaminha o id para a acontroller buscar o filme
+        let dadosVideo = await controllerVideo.setListarPorId(idVideo)
+    
+        response.status(dadosVideo.status_code);
+        response.json(dadosVideo);
+    })
+
+    app.get('/v1/vital/filtroVideo/filtro', cors(), async function(request, response, next){
+        let titulo = request.query.titulo
+        let dadosVideo = await controllerVideo.setFiltrar(titulo)
+
+        response.status(dadosVideo.status_code)
+        response.json(dadosVideo)
+    })
+
+    app.delete('/v1/vital/video/:id', cors (), async function (request,response,next){
+
+        let idVideo = request.params.id
+    
+        let dadosVideo = await controllerVideo.setDeletar(idVideo);
+    
+        response.status(dadosVideo.status_code);
+        response.json(dadosVideo)
+    })
+
+    app.put('/v1/vital/videoAtualizar/:id', cors(), bodyParserJSON, async function(request,response,next){
+
+        let idVideo = request.params.id
+        let contentType = request.headers['content-type'];
+        let dadosBody = request.body
+    
+        let resultUptadeVideo = await controllerVideo.setAtualizar(idVideo, dadosBody, contentType)
+    
+        response.status(resultUptadeVideo.status_code)
+        response.json(resultUptadeVideo)
+    
+    })
+
+         /*********************** AVALIAÇÃO ***********************************/
+         app.post('/v1/vital/avaliacaoMedico', cors(), bodyParserJSON, async function (request, response,next ){
+
+
+            // recebe o ContentType com os tipos de dados encaminhados na requisição
+            let contentType = request.headers['content-type'];
+       
+            // vou receber o que chegar no corpo da requisição e guardar nessa variável local
+            let dadosBody = request.body;
+            // encaminha os dados para a controller enviar para o DAO
+            let resultDadosNovaAvaliacao = await controllerAvaliacao.setInserir(dadosBody, contentType)
+       
+       
+            response.status(resultDadosNovaAvaliacao.status_code);
+            response.json(resultDadosNovaAvaliacao);
+       
+        })
 
     app.listen('8080', function(){
         console.log('API funcionando!!')

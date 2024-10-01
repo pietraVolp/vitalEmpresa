@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         crm: crm.value,
         telefone: telefone.value,
         data_nascimento: dataNascimento.value,
-        especialidades: especialidades.value,
+        especialidades: especialidades.value
        
       }
 
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Verifica o código de status da resposta
         if (response.ok) {
           const result = await response.json()
-          alert('Usuário cadastrado com sucesso!')
+          alert('Médico cadastrado com sucesso!')
           console.log(result)
           window.location.href = '/Front/html/medicos.html'
         } else {

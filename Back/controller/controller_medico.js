@@ -1,6 +1,8 @@
 // Import do arquivo responsavel pela interação com DB(model)
 const { application } = require('express')
 const medicoDAO = require('../model/DAO/medico.js')
+const especialidadeDAO = require('../model/DAO/especialidade.js')
+
 
 // Import do arquivo de configuração do projeto
 const message = require('../modulo/config.js')
@@ -60,6 +62,29 @@ const setInserir = async function(dadosMedico, contentType){
             console.log(error);
             return message.ERROR_INTERNAL_SERVER // 500
         }
+}
+
+const setLoginMedico = async function(crm, senha){
+    try {
+        let JSON = {};
+        let dadosMedico = await medicoDAO.loginMedico(crm, senha);
+
+        if (dadosMedico.length === 0) {
+            return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
+        }
+
+        console.log(crm);
+        
+        // Se tudo estiver correto, retorna a Empresa e uma mensagem de sucesso
+        JSON.id_medico = dadosMedico[0].id_medico;
+        JSON.medico = dadosMedico[0].nome
+        JSON.status_code = message.SUCCESS_LOGIN_ITEM.status_code;
+        JSON.message = message.SUCCESS_LOGIN_ITEM;
+        return JSON;
+    } catch (error) {
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER;
+    }
 }
 
 const setAtualizar = async function(id, dadoAtualizado, contentType){
@@ -160,12 +185,12 @@ const setListar = async function(){
    {
     if(dadosMedico){
 
-        if(dadosMedico.length> 0){
+        if(dadosMedico.length > 0){
 
-            // for(let usuario of dadosUsuario){
-            //     let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
-            //     usuario.sexo = sexoUsuario
-            // }
+             //for(let medico of dadosMedico){
+                // let medicoEspecialidade = await especialidadeDAO.listById(medico.id_especialidade)
+               //  medico.especialidade = medicoEspecialidade
+             //}
 
             medicoJSON.medicos = dadosMedico
             medicoJSON.quantidade = dadosMedico.length
@@ -229,10 +254,105 @@ const setListarPorId = async function(id){
    }
 }
 
+const setFiltrar = async function(crm){
+    try {
+        
+
+        // Recebe o nome da especialidade
+        let crmMedico = crm
+
+        
+        
+
+    //Cria o objeto JSON
+    let medicoJSON = {}
+
+    
+    
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(crmMedico == '' || crmMedico == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosMedico = await medicoDAO.filter(crm)
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosMedico){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosMedico.length > 0){
+                //Criar o JSON de retorno
+                medicoJSON.medico = dadosMedico
+                medicoJSON.quantidade = dadosMedico.length
+                medicoJSON.status_code = 200
+    
+                
+                return medicoJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
+const setFiltrarPorEspecialidade = async function(especialidade){
+    try {
+        // Recebe o nome da especialidade
+        let especialidadeMedico = especialidade
+    //Cria o objeto JSON
+    let medicoJSON = {}
+
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(especialidadeMedico == '' || especialidadeMedico == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosMedico = await medicoDAO.filterBySpecialty(especialidade)
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosMedico){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosMedico.length > 0){
+                //Criar o JSON de retorno
+                medicoJSON.medico = dadosMedico
+                medicoJSON.quantidade = dadosMedico.length
+                medicoJSON.status_code = 200
+    
+                
+                return medicoJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserir,
     setAtualizar,
     setDeletar,
     setListar,
-    setListarPorId
+    setListarPorId,
+    setLoginMedico,
+    setFiltrar,
+    setFiltrarPorEspecialidade
 }

@@ -67,61 +67,26 @@ const setInserirUsuario = async function(dadosUsuario, contentType){
         }
 }
 
-const setLoginUsuario = async function(dadosUsuario, contentType) {
+const setLoginUsuario = async function(email, senha) {
     try {
-        // Validação do contentType
-        if (String(contentType).toLowerCase() !== 'application/json') {
-            return {
-                status_code: 415,
-                message: 'Tipo de conteúdo não suportado. Use application/json.'
-            };
+        let JSON = {};
+        let dadosUsuario = await usuarioDAO.loginUsuario(email, senha);
+
+        if (dadosUsuario.length === 0) {
+            return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
         }
 
-        // Verificar se os dados do usuário estão presentes e válidos
-        if (!dadosUsuario || !dadosUsuario.email || !dadosUsuario.senha) {
-            return {
-                status_code: 400,
-                message: 'Dados inválidos. Verifique se o email e a senha foram fornecidos corretamente.'
-            };
-        }
-
-        // Remover espaços em branco extras
-        const sanitizedEmail = dadosUsuario.email.trim();
-        const sanitizedSenha = dadosUsuario.senha.trim();
-
-        // Validação básica dos dados
-        if (sanitizedEmail.length === 0 || sanitizedSenha.length === 0) {
-            return {
-                status_code: 400,
-                message: 'Email e senha são obrigatórios.'
-            };
-        }
-
-        // Chamar o DAO para tentar o login
-        const idUsuario = await usuarioDAO.loginUsuario({
-            email: sanitizedEmail,
-            senha: sanitizedSenha
-        });
-
-        // Verifica se o ID do usuário foi retornado
-        if (idUsuario) {
-            return {
-                usuario_id: idUsuario,
-                status_code: 200,
-                message: 'Login bem-sucedido.'
-            };
-        } else {
-            return {
-                status_code: 401,
-                message: 'Email ou senha incorretos.'
-            };
-        }
+        console.log(senha);
+        
+        // Se tudo estiver correto, retorna a Empresa e uma mensagem de sucesso
+        JSON.id_usuario = dadosUsuario[0].id_usuario;
+        JSON.usuario = dadosUsuario[0].nome
+        JSON.status_code = message.SUCCESS_LOGIN_ITEM.status_code;
+        JSON.message = message.SUCCESS_LOGIN_ITEM;
+        return JSON;
     } catch (error) {
-        console.log('Erro ao processar a requisição:', error);
-        return {
-            status_code: 500,
-            message: 'Erro interno do servidor.'
-        };
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER;
     }
 };
 
@@ -219,14 +184,20 @@ const setListarUsuario = async function(){
         let usuarioJSON = {}
 
    let dadosUsuario= await usuarioDAO.selectAllUsuario()
+
+
+   
    {
     if(dadosUsuario){
 
         if(dadosUsuario.length> 0){
 
             // for(let usuario of dadosUsuario){
-            //     let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
-            //     usuario.sexo = sexoUsuario
+            //   let sexoUsuario = await sexoDAO.selectByIdSexo(usuario.id_sexo)
+            // //   let enderecoUsuario = await enderecoUsuarioDAO.selectByIdEnderecoUsuario(usuario.id_endereco)
+            //   delete usuario.id_sexo
+            //    usuario.sexo = sexoUsuario
+            // //    usuario.endereco = enderecoUsuario
             // }
 
             usuarioJSON.usuarios = dadosUsuario
@@ -291,11 +262,59 @@ const setListarUsuarioById = async function(id){
    }
 }
 
+const setFilterBySexo = async function(descricao){
+    try {
+        
+
+        // Recebe o nome da especialidade
+        let descricaoSexo = descricao
+    //Cria o objeto JSON
+    let sexoJSON = {}
+
+    
+    
+    //Validação para verificar se o id é válido(Vazio, indefinido e não numérico)
+    if(descricaoSexo == '' || descricaoSexo == undefined){
+        return message.ERROR_INVALID_ID // 400
+    }else{
+        
+        //Encaminha para o DAO localizar o id do filme 
+        let dadosSexo = await usuarioDAO.filterBySexo(descricao)
+        console.log(dadosSexo);
+        
+        
+        // Validação para verificar se existem dados de retorno
+        if(dadosSexo){
+
+            // Validação para verificar a quantidade de itens encontrados.
+            if(dadosSexo.length > 0){
+                //Criar o JSON de retorno
+                sexoJSON.usuarios = dadosSexo
+                sexoJSON.quantidade = dadosSexo.length
+                sexoJSON.status_code = 200
+    
+                
+                return sexoJSON
+            }else{
+                return message.ERROR_NOT_FOUND // 404
+            }
+
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+        }
+    }
+   } catch (error) {
+       console.log(error)
+       return message.ERROR_INTERNAL_SERVER_DB
+   }
+}
+
 module.exports = {
     setInserirUsuario,
     setLoginUsuario,
     setAtualizarUsuario,
     setDeletarUsuario,
     setListarUsuario,
-    setListarUsuarioById
+    setListarUsuarioById,
+    setFilterBySexo
 }

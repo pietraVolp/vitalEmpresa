@@ -12,7 +12,7 @@ const validarLogin = async (id) => {
     alert('Por Favor Preencha todos os Campos !!')
   } else {
     try {
-      const response = await fetch(`http://localhost:8080/v1/vital/empresa/${id}`, {
+      const response = await fetch(`http://localhost:8080/v1/vital/loginEmpresa`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

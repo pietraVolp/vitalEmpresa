@@ -68,6 +68,29 @@ const setInserir = async function(dadosEmpresa, contentType){
         }
 }
 
+const setLoginEmpresa = async function(cnpj, senha){
+    try {
+        let JSON = {};
+        let dadosEmpresa = await empresaDAO.loginEmpresa(cnpj, senha);
+
+        if (dadosEmpresa.length === 0) {
+            return { status_code: 400, message: 'Empresa não encontrada ou senha incorreta' };
+        }
+
+        console.log(cnpj);
+        
+        // Se tudo estiver correto, retorna a Empresa e uma mensagem de sucesso
+        JSON.id = dadosEmpresa[0].id_empresa;
+        JSON.empresa = dadosEmpresa[0].nome_empresa
+        JSON.status_code = message.SUCCESS_LOGIN_ITEM.status_code;
+        JSON.message = message.SUCCESS_LOGIN_ITEM;
+        return JSON;
+    } catch (error) {
+        console.log(error);
+        return message.ERROR_INTERNAL_SERVER;
+    }
+}
+
 
 const setAtualizar = async function(id, dadoAtualizado, contentType){
     try{
@@ -250,6 +273,7 @@ const setListarPorId = async function(id){
 
 module.exports = {
     setInserir,
+    setLoginEmpresa,
     setAtualizar,
     setDeletar,
     setListar,

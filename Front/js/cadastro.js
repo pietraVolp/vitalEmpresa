@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const cidade = document.getElementById('cidade')
   const estado = document.getElementById('estado')
   const cadastro = document.getElementById('cadastro')
-  const toggleSenha = document.getElementById('toggleSenha')
+  const cadastroEmpresa = document.getElementById('cadastroEmpresa')
+ 
 
   // Verifica se o botão foi encontrado
   if (cadastro) {
@@ -63,4 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     console.error('O botão de cadastro não foi encontrado no DOM')
   }
+
+  window.location.href = '/Front/html/cadastro.html'
 })

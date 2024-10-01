@@ -6,13 +6,14 @@ const prisma = new PrismaClient()
 
 const insert = async function(dadosMedico){
     try {
-        const sql = `CALL sp_inserir_medico_ultima_empresa(
+        const sql = `CALL sp_inserir_medico_com_especialidades(
             '${dadosMedico.nome}',
             '${dadosMedico.email}',
             '${dadosMedico.senha}',
             '${dadosMedico.telefone}',
             '${dadosMedico.crm}',
-            '${dadosMedico.data_nascimento}'
+            '${dadosMedico.data_nascimento}',
+            '${dadosMedico.especialidades}'
         );
         `
         console.log(sql)
@@ -25,6 +26,23 @@ const insert = async function(dadosMedico){
         }else{
            return false
         }
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const loginMedico = async function(crm, senha){
+    try {
+        const sql = `select id_medico, nome from tbl_medicos where crm = '${crm}' and senha = '${senha}';
+`
+        console.log(sql)
+       
+        let result = await prisma.$queryRawUnsafe(sql)
+        console.log(result);
+
+       return result
+
     } catch (error) {
         console.log(error)
         return false
@@ -118,11 +136,55 @@ const ID = async function(){
     }
 }
 
+const filter = async function(crm){
+    try {
+        let sql = `select * from tbl_medicos where crm like "%${crm}%"`        
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+        return rsFilter
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const filterBySpecialty = async function(especialidade){
+    try {
+        let sql = `            SELECT
+    m.nome AS nome_medico,
+    m.email AS email_medico,
+    m.telefone AS telefone_medico,
+    m.crm,
+    e.nome AS especialidade,
+    emp.nome_empresa
+FROM
+    tbl_medicos m
+JOIN
+    tbl_medico_especialidade me ON m.id_medico = me.id_medico
+JOIN
+    tbl_especialidades e ON me.id_especialidade = e.id_especialidade
+JOIN
+    tbl_empresa emp ON m.id_empresa = emp.id_empresa
+WHERE
+    e.nome LIKE '%${especialidade}%';`      
+
+        let rsFilter = await prisma.$queryRawUnsafe(sql)
+
+        return rsFilter
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 module.exports = {
     insert,
     update,
     deletar,
     listAll,
     listById,
-    ID
+    ID,
+    loginMedico,
+    filter,
+    filterBySpecialty
 }
